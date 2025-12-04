@@ -1,85 +1,418 @@
-<!doctype html>
-<head>																																																					<!doctype html> 
-<html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Moon Quest: Star Sprint</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-<meta charset="UTF-8">
-<title>WEB 수업</title>
-<style>
-  #wrap {
-   border: 5px solid red;
-    padding:5px;
-	font-size: 100px;
-	margin: 5px;
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Segoe UI", sans-serif;
+      color: #f5f5f5;
+      background: radial-gradient(circle at top, #1d2b64 0%, #0b0e1c 65%, #05060a 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      padding: 30px 12px;
+    }
 
-  }  
-  a {
-    color:black;
-	font-size:50px;
-  }
-  h1 {
-    color:black;
-	font-size:50px;
-	display: block;
-  }
-  .BG {
-     color: red;
-  
-  }
-  <!--h1{
-    color:black;
-	font-size:50px;
-	}-->
-  h2{
-    font-size:20px;
-	
-   }
-  
-</style>																																																																																																																												
+    h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      letter-spacing: 0.04em;
+    }
+
+    p {
+      margin: 4px 0;
+    }
+
+    #hud {
+      width: 860px;
+      max-width: calc(100vw - 24px);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      padding: 10px 18px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+      font-weight: 600;
+    }
+
+    .hud-item {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      font-size: 1.05rem;
+    }
+
+    #game-frame {
+      width: 860px;
+      max-width: calc(100vw - 24px);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(11, 14, 28, 0.9);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+    }
+
+    canvas {
+      width: 828px;
+      height: 468px;
+      display: block;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #0f1633 0%, #152040 65%, #3d3140 100%);
+    }
+
+    #instructions {
+      width: 860px;
+      max-width: calc(100vw - 24px);
+      text-align: left;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    #reset-btn {
+      border: none;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: #f1c40f;
+      color: #091326;
+      font-weight: 700;
+      transition: transform 0.2s ease;
+    }
+
+    #reset-btn:hover {
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
-																																																	
 <body>
-<h1> WEB1 </h1>
+  <h1>Moon Quest: Star Sprint</h1>
+  <div id="hud">
+    <div class="hud-item">⭐ 수집한 별 조각: <span id="score">0 / 10</span></div>
+    <div class="hud-item">⏱ 남은 시간: <span id="timer">60초</span></div>
+    <div class="hud-item">🎯 목표: 60초 안에 10개 모으기</div>
+    <button id="reset-btn" type="button">게임 다시 시작</button>
+  </div>
 
-<div>
-<div id = "wrap">
-  <h1> WEB2 </h1>
-</div>
-</div>
-<ol>
-<li><h2><a href="1.html"><!--<font color="blue">-->HTML </font></a></h2></li>
-<li><h2><a href="2.html" class = "BG">CSS</a></h2></li>
-<li><h2><a href="3.html">JavaScript</a></h2></li>
-</ol>
+  <div id="game-frame">
+    <canvas id="game" width="828" height="468"></canvas>
+  </div>
 
+  <div id="instructions">
+    <strong>조작 방법</strong>
+    <p>← → 방향키로 이동하고, 스페이스바로 점프하세요. 60초 안에 별 조각 10개를 모두 모으면 승리이고 시간이 다 되면 실패입니다.</p>
+    <p>플랫폼은 세 개뿐이니, 점프 타이밍을 잘 맞추어 달 표면 위를 빠르게 탐험해 보세요!</p>
+  </div>
 
-<p style="margin-top:100px:"> 
-웹의 원래 의미는 <u>「거미집」</u>으로 <strong>하나의 사이트<br><br>
-</strong>나 또는 다른 <strong>사이트와의 관계</strong>가 거미집처럼 
-복잡하게 얽혀 있기 때문에 웹이라고 부른다>
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const timerEl = document.getElementById('timer');
+    const resetBtn = document.getElementById('reset-btn');
 
-<p style="margin-top:1000px:"> 
+    const WIDTH = canvas.width;
+    const HEIGHT = canvas.height;
 
-<p>월드 와이드 웹(World Wide Web, WWW, W3)은 
-인터넷에 연결된 컴퓨터를 통해 사람들이 정보를 공유할 수 있는 전 세계적인 정보 공간을 말한다.</p> 
-간단히 웹(the Web)이라 부르는 경우가 많다. 이 용어는 
-인터넷과 동의어로 쓰이는 경우가 많으나 엄격히 말해 서로 다른 개념이다. 
-웹은 전자 메일과 같이 인터넷 상에서 동작하는 하나의 서비스일 뿐이다. 
-그러나 1993년 이래로 웹은 인터넷 구조의 절대적 위치를 차지하고 있다.
+    const player = {
+      x: 80,
+      y: 360,
+      width: 36,
+      height: 60,
+      vx: 0,
+      vy: 0,
+      accel: 0.5,
+      maxSpeed: 4,
+      jumpPower: 12,
+      onGround: false
+    };
 
-인터넷에서 HTTP 프로토콜, 하이퍼텍스트, HTML형식 등을 사용하여 
-그림과 문자를 교환하는 전송방식을 말하기도 한다.
-</p>
-</p>
-<img src="coding.jpg" width="40%"><br><br>
+    const platforms = [
+      { x: 0, y: 420, width: WIDTH, height: 48 },
+      { x: 120, y: 320, width: 140, height: 18 },
+      { x: 350, y: 250, width: 180, height: 18 },
+      { x: 620, y: 190, width: 160, height: 18 }
+    ];
 
-<p>
-<video src = "video1.mp4" width="45%" controls loop >
- <!--<source src = "video1.mp4" type="video/mp4">-->
-</video>
-</p>
-<p>
+    const starSlots = [
+      { x: 70, y: 370 },
+      { x: 190, y: 285 },
+      { x: 280, y: 370 },
+      { x: 360, y: 220 },
+      { x: 450, y: 370 },
+      { x: 510, y: 220 },
+      { x: 640, y: 155 },
+      { x: 720, y: 360 },
+      { x: 780, y: 155 },
+      { x: 520, y: 320 }
+    ];
 
+    const stars = starSlots.map((pos, idx) => ({
+      id: idx,
+      x: pos.x,
+      y: pos.y,
+      size: 16,
+      collected: false
+    }));
+
+    const keys = { left: false, right: false };
+    let collectedCount = 0;
+    let timeLeft = 60;
+    let gameOver = false;
+    let countdownId = null;
+    let animationFrame = null;
+
+    function resetGame() {
+      player.x = 80;
+      player.y = 360;
+      player.vx = 0;
+      player.vy = 0;
+      player.onGround = false;
+      collectedCount = 0;
+      timeLeft = 60;
+      gameOver = false;
+      stars.forEach((star) => {
+        star.collected = false;
+      });
+      updateHUD();
+      if (countdownId) {
+        clearInterval(countdownId);
+      }
+      countdownId = setInterval(() => {
+        if (!gameOver) {
+          timeLeft = Math.max(0, timeLeft - 1);
+          updateHUD();
+          if (timeLeft === 0) {
+            triggerFailure();
+          }
+        }
+      }, 1000);
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+      animationLoop();
+    }
+
+    function updateHUD(message = '') {
+      scoreEl.textContent = `${collectedCount} / 10`;
+      timerEl.textContent = `${timeLeft}초`;
+      if (message) {
+        timerEl.textContent += ` · ${message}`;
+      }
+    }
+
+    function triggerVictory() {
+      gameOver = true;
+      updateHUD('임무 성공!');
+    }
+
+    function triggerFailure() {
+      gameOver = true;
+      updateHUD('시간 초과!');
+    }
+
+    function applyPhysics() {
+      if (keys.left) {
+        player.vx = Math.max(player.vx - player.accel, -player.maxSpeed);
+      } else if (keys.right) {
+        player.vx = Math.min(player.vx + player.accel, player.maxSpeed);
+      } else {
+        player.vx *= 0.85;
+        if (Math.abs(player.vx) < 0.05) player.vx = 0;
+      }
+
+      player.vy += 0.6; // gravity
+      player.x += player.vx;
+      player.y += player.vy;
+
+      // Wall bounds
+      if (player.x < 0) player.x = 0;
+      if (player.x + player.width > WIDTH) player.x = WIDTH - player.width;
+
+      player.onGround = false;
+      platforms.forEach((plat) => {
+        if (
+          player.x < plat.x + plat.width &&
+          player.x + player.width > plat.x &&
+          player.y < plat.y + plat.height &&
+          player.y + player.height > plat.y
+        ) {
+          // landed on top
+          if (player.vy > 0 && player.y + player.height - player.vy <= plat.y + 4) {
+            player.y = plat.y - player.height;
+            player.vy = 0;
+            player.onGround = true;
+          } else if (player.vy < 0) {
+            player.y = plat.y + plat.height;
+            player.vy = 0;
+          }
+        }
+      });
+
+      // Bottom floor safety
+      if (player.y + player.height > HEIGHT) {
+        player.y = HEIGHT - player.height;
+        player.vy = 0;
+        player.onGround = true;
+      }
+    }
+
+    function collectStars() {
+      stars.forEach((star) => {
+        if (star.collected) return;
+        const hit =
+          player.x < star.x + star.size &&
+          player.x + player.width > star.x &&
+          player.y < star.y + star.size &&
+          player.y + player.height > star.y;
+        if (hit) {
+          star.collected = true;
+          collectedCount += 1;
+          updateHUD();
+          if (collectedCount === stars.length) {
+            triggerVictory();
+          }
+        }
+      });
+    }
+
+    function drawBackground() {
+      const gradient = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+      gradient.addColorStop(0, '#0b1740');
+      gradient.addColorStop(0.5, '#14254d');
+      gradient.addColorStop(1, '#2a2235');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+      // distant stars
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      for (let i = 0; i < 40; i += 1) {
+        const x = (i * 53) % WIDTH;
+        const y = (i * 97) % 200;
+        const size = (i % 3) + 1;
+        ctx.fillRect(x, y, size, size);
+      }
+
+      // moon surface
+      ctx.fillStyle = '#d8d8d8';
+      ctx.beginPath();
+      ctx.ellipse(WIDTH / 2, HEIGHT + 60, WIDTH / 1.1, 140, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#c5c4c2';
+      ctx.beginPath();
+      ctx.ellipse(WIDTH / 2, HEIGHT + 40, WIDTH, 120, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawPlatforms() {
+      ctx.fillStyle = '#544c61';
+      platforms.forEach((plat, idx) => {
+        ctx.fillStyle = idx === 0 ? '#a89ca9' : '#6c5b7c';
+        ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+      });
+    }
+
+    function drawPlayer() {
+      ctx.save();
+      ctx.translate(player.x, player.y);
+      // body
+      ctx.fillStyle = '#4fc3f7';
+      ctx.fillRect(0, 12, player.width, player.height - 12);
+      // helmet
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(4, 0, player.width - 8, 24);
+      ctx.fillStyle = '#1e3a5f';
+      ctx.fillRect(8, 4, player.width - 16, 16);
+      // backpack
+      ctx.fillStyle = '#2d9cdb';
+      ctx.fillRect(-6, 24, 10, 26);
+      ctx.restore();
+    }
+
+    function drawStars() {
+      ctx.fillStyle = '#f9e79f';
+      ctx.strokeStyle = '#f7dc6f';
+      ctx.lineWidth = 1.2;
+      stars.forEach((star) => {
+        if (star.collected) return;
+        drawStarShape(star.x + star.size / 2, star.y + star.size / 2, 5, star.size / 2, star.size / 4);
+      });
+    }
+
+    function drawStarShape(x, y, points, outerRadius, innerRadius) {
+      ctx.beginPath();
+      for (let i = 0; i < 2 * points; i += 1) {
+        const angle = (Math.PI / points) * i;
+        const radius = i % 2 === 0 ? outerRadius : innerRadius;
+        ctx.lineTo(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    function drawStatusText() {
+      if (!gameOver) return;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+      ctx.fillRect(0, HEIGHT / 2 - 50, WIDTH, 100);
+      ctx.fillStyle = '#f8f8f2';
+      ctx.font = '32px "Segoe UI", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const text = collectedCount === stars.length ? '임무 완료! 🌕' : '시간 초과! 다시 도전!';
+      ctx.fillText(text, WIDTH / 2, HEIGHT / 2);
+    }
+
+    function animationLoop() {
+      ctx.clearRect(0, 0, WIDTH, HEIGHT);
+      drawBackground();
+      drawPlatforms();
+      applyPhysics();
+      collectStars();
+      drawStars();
+      drawPlayer();
+      drawStatusText();
+      if (!gameOver) {
+        animationFrame = requestAnimationFrame(animationLoop);
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'ArrowLeft') keys.left = true;
+      if (e.code === 'ArrowRight') keys.right = true;
+      if (e.code === 'Space' && player.onGround) {
+        player.vy = -player.jumpPower;
+        player.onGround = false;
+      }
+      if (e.code === 'Space' && gameOver) {
+        resetGame();
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.code === 'ArrowLeft') keys.left = false;
+      if (e.code === 'ArrowRight') keys.right = false;
+    });
+
+    resetBtn.addEventListener('click', resetGame);
+
+    resetGame();
+  </script>
 </body>
-<!--<a href="https://html.spec.whatwg.org/multipage/" target="_blank" title="HTML"> HTML </a>-->
-<!-- 주석-->
 </html>
