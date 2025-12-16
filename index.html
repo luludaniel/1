@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>피하기 게임 (HTML 단일 파일)</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1020;
+      --panel: rgba(255, 255, 255, 0.08);
+      --panel2: rgba(255, 255, 255, 0.12);
+      --text: rgba(255, 255, 255, 0.92);
+      --muted: rgba(255, 255, 255, 0.72);
+      --accent: #7c5cff;
+      --danger: #ff4d6d;
+      --good: #2ee59d;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 700px at 30% 20%, #141a34 0%, var(--bg) 55%, #070a14 100%);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, Apple SD Gothic Neo, "Malgun Gothic", Arial, sans-serif;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+
+    .wrap {
+      width: min(920px, 100%);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .title {
+      display: grid;
+      gap: 6px;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.2px;
+      font-weight: 750;
+    }
+
+    .title p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .pillrow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .pill strong {
+      color: var(--text);
+      font-weight: 760;
+    }
+
+    .stage {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      box-shadow:
+        0 24px 70px rgba(0, 0, 0, 0.45),
+        inset 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 3 / 4;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.38);
+      backdrop-filter: blur(8px);
+    }
+
+    .card {
+      width: min(520px, 100%);
+      border-radius: 18px;
+      background: rgba(12, 16, 32, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.5);
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btnrow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 780;
+      color: #0a0f1f;
+      background: linear-gradient(180deg, rgba(124,92,255,1), rgba(95,72,214,1));
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(124, 92, 255, 0.35);
+    }
+
+    button.secondary {
+      color: var(--text);
+      background: var(--panel2);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: none;
+    }
+
+    button:active { transform: translateY(1px); }
+
+    .kbd {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .key {
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .hidden { display: none; }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    a { color: rgba(180, 170, 255, 0.95); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>피하기 게임</h1>
+        <p>떨어지는 블록을 피하면서 오래 버티세요. 시간이 지날수록 더 빠르고 더 자주 떨어집니다.</p>
+      </div>
+      <div class="pillrow" aria-live="polite">
+        <div class="pill">점수(생존): <strong id="score">0.0</strong>s</div>
+        <div class="pill">최고: <strong id="best">0.0</strong>s</div>
+        <div class="pill">난이도: <strong id="level">1</strong></div>
+      </div>
+    </header>
+
+    <div class="stage">
+      <canvas id="game" width="480" height="640" aria-label="피하기 게임 캔버스" role="img"></canvas>
+
+      <div id="overlay" class="overlay">
+        <div class="card" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+          <h2 id="dlgTitle">시작하기</h2>
+          <p id="dlgDesc">
+            <span class="kbd">
+              <span class="key">←</span><span class="key">→</span>
+              <span class="small">또는</span>
+              <span class="key">A</span><span class="key">D</span>
+              <span class="small">로 좌우 이동</span>
+            </span>
+            <br />모바일은 화면을 누른 채 좌우로 움직이면 됩니다.
+            <br /><span class="small">일시정지: <span class="key">P</span> 또는 <span class="key">Space</span></span>
+          </p>
+
+          <div class="grid">
+            <div class="pill">목표: <strong>충돌하지 않기</strong></div>
+            <div class="pill">팁: <strong>가장자리로 몰리지 않기</strong></div>
+          </div>
+
+          <div class="btnrow">
+            <button id="startBtn" type="button">게임 시작</button>
+            <button id="restartBtn" class="secondary hidden" type="button">다시 시작</button>
+            <button id="resetBestBtn" class="secondary" type="button">최고점 초기화</button>
+          </div>
+          <p class="small" id="hint">브라우저에서 `index.html`을 열면 바로 실행됩니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div>조작이 안 되면 캔버스를 한 번 클릭/터치하세요.</div>
+      <div>단일 파일 버전 · 로컬에서만 저장(최고점)</div>
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      /** @type {HTMLCanvasElement} */
+      const canvas = document.getElementById('game');
+      const ctx = canvas.getContext('2d');
+
+      const scoreEl = document.getElementById('score');
+      const bestEl = document.getElementById('best');
+      const levelEl = document.getElementById('level');
+
+      const overlay = document.getElementById('overlay');
+      const dlgTitle = document.getElementById('dlgTitle');
+      const dlgDesc = document.getElementById('dlgDesc');
+
+      const startBtn = document.getElementById('startBtn');
+      const restartBtn = document.getElementById('restartBtn');
+      const resetBestBtn = document.getElementById('resetBestBtn');
+
+      const W = canvas.width;
+      const H = canvas.height;
+
+      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+      const BEST_KEY = 'simple-dodge-best-v1';
+      const loadBest = () => {
+        const v = Number(localStorage.getItem(BEST_KEY));
+        return Number.isFinite(v) ? v : 0;
+      };
+      const saveBest = (v) => localStorage.setItem(BEST_KEY, String(v));
+
+      let best = loadBest();
+      bestEl.textContent = best.toFixed(1);
+
+      const state = {
+        running: false,
+        paused: false,
+        gameOver: false,
+        time: 0,
+        level: 1,
+        lastTs: 0,
+        spawnT: 0,
+        rng: Math.random,
+      };
+
+      const player = {
+        w: 46,
+        h: 18,
+        x: W / 2,
+        y: H - 56,
+        vx: 0,
+        speed: 420, // px/s
+      };
+
+      /** @type {{x:number,y:number,w:number,h:number,vy:number}[]} */
+      let blocks = [];
+
+      const input = {
+        left: false,
+        right: false,
+        pointerDown: false,
+        pointerX: null,
+        pointerOffsetX: 0,
+      };
+
+      function resetGame() {
+        state.running = false;
+        state.paused = false;
+        state.gameOver = false;
+        state.time = 0;
+        state.level = 1;
+        state.lastTs = 0;
+        state.spawnT = 0;
+
+        player.x = W / 2;
+        player.vx = 0;
+
+        blocks = [];
+        scoreEl.textContent = '0.0';
+        levelEl.textContent = '1';
+      }
+
+      function startGame() {
+        if (state.running) return;
+        state.running = true;
+        state.paused = false;
+        state.gameOver = false;
+        overlay.classList.add('hidden');
+        canvas.focus?.();
+        requestAnimationFrame(loop);
+      }
+
+      function setOverlay(mode) {
+        overlay.classList.remove('hidden');
+        restartBtn.classList.toggle('hidden', mode === 'start');
+        startBtn.classList.toggle('hidden', mode !== 'start');
+
+        if (mode === 'start') {
+          dlgTitle.textContent = '시작하기';
+        } else if (mode === 'paused') {
+          dlgTitle.textContent = '일시정지';
+        } else if (mode === 'gameover') {
+          dlgTitle.textContent = '게임 오버';
+        }
+      }
+
+      function togglePause() {
+        if (!state.running || state.gameOver) return;
+        state.paused = !state.paused;
+        if (state.paused) {
+          setOverlay('paused');
+        } else {
+          overlay.classList.add('hidden');
+          state.lastTs = 0;
+          requestAnimationFrame(loop);
+        }
+      }
+
+      function difficultyAt(t) {
+        // t: seconds survived
+        // spawn interval decreases, speed increases.
+        const lvl = 1 + Math.floor(t / 8);
+        const spawn = clamp(0.78 - 0.05 * (lvl - 1), 0.25, 0.78);
+        const speed = 160 + 22 * (lvl - 1);
+        const maxBlocks = clamp(3 + lvl, 4, 14);
+        return { lvl, spawn, speed, maxBlocks };
+      }
+
+      function spawnBlock(baseSpeed, lvl) {
+        const w = clamp(24 + state.rng() * (56 + lvl * 2), 24, 120);
+        const h = clamp(16 + state.rng() * 26, 16, 42);
+        const x = clamp(state.rng() * (W - w), 0, W - w);
+        const y = -h - 10;
+        const jitter = (state.rng() - 0.5) * 18;
+        const vy = baseSpeed + jitter;
+        blocks.push({ x, y, w, h, vy });
+      }
+
+      function aabb(ax, ay, aw, ah, bx, by, bw, bh) {
+        return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+      }
+
+      function update(dt) {
+        // Update time/score
+        state.time += dt;
+        scoreEl.textContent = state.time.toFixed(1);
+
+        const d = difficultyAt(state.time);
+        state.level = d.lvl;
+        levelEl.textContent = String(d.lvl);
+
+        // Input -> velocity
+        let dir = 0;
+        if (input.left) dir -= 1;
+        if (input.right) dir += 1;
+
+        if (input.pointerDown && typeof input.pointerX === 'number') {
+          // Follow pointer smoothly
+          const targetX = clamp(input.pointerX - input.pointerOffsetX, player.w / 2, W - player.w / 2);
+          const dx = targetX - player.x;
+          // Blend keyboard and pointer: pointer takes priority
+          player.vx = clamp(dx * 12, -player.speed, player.speed);
+        } else {
+          player.vx = dir * player.speed;
+        }
+
+        player.x = clamp(player.x + player.vx * dt, player.w / 2, W - player.w / 2);
+
+        // Spawn blocks
+        state.spawnT += dt;
+        if (state.spawnT >= d.spawn) {
+          state.spawnT = 0;
+          if (blocks.length < d.maxBlocks) {
+            // Sometimes spawn 2 at higher levels
+            spawnBlock(d.speed, d.lvl);
+            if (d.lvl >= 6 && state.rng() < 0.25) spawnBlock(d.speed * 0.98, d.lvl);
+          }
+        }
+
+        // Move blocks
+        for (const b of blocks) {
+          b.y += b.vy * dt;
+        }
+
+        // Remove off-screen
+        blocks = blocks.filter(b => b.y < H + 80);
+
+        // Collisions
+        const px = player.x - player.w / 2;
+        const py = player.y - player.h / 2;
+        for (const b of blocks) {
+          if (aabb(px, py, player.w, player.h, b.x, b.y, b.w, b.h)) {
+            endGame();
+            break;
+          }
+        }
+      }
+
+      function endGame() {
+        state.gameOver = true;
+        state.running = false;
+        state.paused = false;
+
+        if (state.time > best) {
+          best = state.time;
+          saveBest(best);
+          bestEl.textContent = best.toFixed(1);
+        }
+
+        dlgDesc.innerHTML = `최종 점수: <strong style="color: var(--text)">${state.time.toFixed(1)}s</strong><br />최고 점수: <strong style="color: var(--good)">${best.toFixed(1)}s</strong>`;
+        setOverlay('gameover');
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+
+        // Background grid
+        ctx.save();
+        ctx.globalAlpha = 0.20;
+        ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+        ctx.lineWidth = 1;
+        const step = 32;
+        for (let x = 0; x <= W; x += step) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, H);
+          ctx.stroke();
+        }
+        for (let y = 0; y <= H; y += step) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(W, y);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // Blocks
+        for (const b of blocks) {
+          const grad = ctx.createLinearGradient(b.x, b.y, b.x + b.w, b.y + b.h);
+          grad.addColorStop(0, 'rgba(255,77,109,0.95)');
+          grad.addColorStop(1, 'rgba(124,92,255,0.95)');
+          ctx.fillStyle = grad;
+          roundRect(ctx, b.x, b.y, b.w, b.h, 8);
+          ctx.fill();
+
+          ctx.strokeStyle = 'rgba(255,255,255,0.20)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+
+        // Player
+        const px = player.x - player.w / 2;
+        const py = player.y - player.h / 2;
+        const pgrad = ctx.createLinearGradient(px, py, px + player.w, py + player.h);
+        pgrad.addColorStop(0, 'rgba(46,229,157,0.95)');
+        pgrad.addColorStop(1, 'rgba(255,255,255,0.92)');
+        ctx.fillStyle = pgrad;
+        roundRect(ctx, px, py, player.w, player.h, 9);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // HUD hint inside canvas
+        ctx.save();
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = 'rgba(0,0,0,0.25)';
+        roundRect(ctx, 12, 12, 200, 42, 10);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(255,255,255,0.90)';
+        ctx.font = '700 12px ui-sans-serif, system-ui, sans-serif';
+        ctx.fillText('← → / A D 이동', 22, 30);
+        ctx.font = '600 11px ui-sans-serif, system-ui, sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.75)';
+        ctx.fillText('P 또는 Space: 일시정지', 22, 46);
+        ctx.restore();
+
+        if (state.paused) {
+          ctx.save();
+          ctx.fillStyle = 'rgba(0,0,0,0.35)';
+          ctx.fillRect(0, 0, W, H);
+          ctx.fillStyle = 'rgba(255,255,255,0.95)';
+          ctx.font = '800 30px ui-sans-serif, system-ui, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('PAUSED', W / 2, H / 2);
+          ctx.restore();
+        }
+      }
+
+      function roundRect(c, x, y, w, h, r) {
+        const rr = Math.min(r, w / 2, h / 2);
+        c.beginPath();
+        c.moveTo(x + rr, y);
+        c.arcTo(x + w, y, x + w, y + h, rr);
+        c.arcTo(x + w, y + h, x, y + h, rr);
+        c.arcTo(x, y + h, x, y, rr);
+        c.arcTo(x, y, x + w, y, rr);
+        c.closePath();
+      }
+
+      function loop(ts) {
+        if (!state.running || state.paused || state.gameOver) return;
+
+        if (!state.lastTs) state.lastTs = ts;
+        const dt = clamp((ts - state.lastTs) / 1000, 0, 0.05);
+        state.lastTs = ts;
+
+        update(dt);
+        draw();
+
+        if (state.running) requestAnimationFrame(loop);
+      }
+
+      // Controls
+      window.addEventListener('keydown', (e) => {
+        const k = e.key.toLowerCase();
+        if (k === 'arrowleft' || k === 'a') { input.left = true; e.preventDefault(); }
+        if (k === 'arrowright' || k === 'd') { input.right = true; e.preventDefault(); }
+        if (k === 'p' || k === ' ') { togglePause(); e.preventDefault(); }
+        if (!state.running && !state.gameOver && (k === 'enter')) { startGame(); }
+        if (state.gameOver && (k === 'enter' || k === 'r')) {
+          resetGame();
+          dlgDesc.innerHTML = document.getElementById('dlgDesc').innerHTML;
+          startGame();
+        }
+      }, { passive: false });
+
+      window.addEventListener('keyup', (e) => {
+        const k = e.key.toLowerCase();
+        if (k === 'arrowleft' || k === 'a') input.left = false;
+        if (k === 'arrowright' || k === 'd') input.right = false;
+      });
+
+      // Pointer/touch
+      function pointerToCanvasX(clientX) {
+        const rect = canvas.getBoundingClientRect();
+        const x = (clientX - rect.left) * (canvas.width / rect.width);
+        return x;
+      }
+
+      canvas.addEventListener('pointerdown', (e) => {
+        canvas.setPointerCapture?.(e.pointerId);
+        input.pointerDown = true;
+        input.pointerX = pointerToCanvasX(e.clientX);
+
+        // Offset so the player doesn't jump to pointer center instantly
+        input.pointerOffsetX = input.pointerX - player.x;
+
+        // Clicking canvas dismisses overlay if paused (resume) or start screen
+        if (!state.running && !state.gameOver) startGame();
+        if (state.paused) togglePause();
+
+        e.preventDefault();
+      }, { passive: false });
+
+      canvas.addEventListener('pointermove', (e) => {
+        if (!input.pointerDown) return;
+        input.pointerX = pointerToCanvasX(e.clientX);
+        e.preventDefault();
+      }, { passive: false });
+
+      function endPointer() {
+        input.pointerDown = false;
+        input.pointerX = null;
+      }
+
+      canvas.addEventListener('pointerup', endPointer);
+      canvas.addEventListener('pointercancel', endPointer);
+      canvas.addEventListener('pointerleave', () => {
+        // If the user drags out of the canvas, stop pointer control
+        endPointer();
+      });
+
+      // Buttons
+      startBtn.addEventListener('click', () => {
+        dlgDesc.innerHTML = document.getElementById('dlgDesc').innerHTML;
+        startGame();
+      });
+
+      restartBtn.addEventListener('click', () => {
+        resetGame();
+        // Restore instruction text
+        dlgDesc.innerHTML = `
+          <span class="kbd">
+            <span class="key">←</span><span class="key">→</span>
+            <span class="small">또는</span>
+            <span class="key">A</span><span class="key">D</span>
+            <span class="small">로 좌우 이동</span>
+          </span>
+          <br />모바일은 화면을 누른 채 좌우로 움직이면 됩니다.
+          <br /><span class="small">일시정지: <span class="key">P</span> 또는 <span class="key">Space</span></span>
+        `;
+        setOverlay('start');
+        startGame();
+      });
+
+      resetBestBtn.addEventListener('click', () => {
+        best = 0;
+        saveBest(best);
+        bestEl.textContent = best.toFixed(1);
+      });
+
+      // Initial draw
+      resetGame();
+      draw();
+      setOverlay('start');
+    })();
+  </script>
+</body>
+</html>
