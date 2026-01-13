@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Layout starter</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <div class="app-shell">
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand__mark" aria-hidden="true">▦</span>
+          <span class="brand__name">Your App</span>
+        </div>
+
+        <div class="header-actions">
+          <input class="search" type="search" placeholder="Search…" aria-label="Search" />
+          <button class="button" type="button">Sign in</button>
+        </div>
+      </header>
+
+      <aside class="app-sidebar" aria-label="Sidebar">
+        <nav class="nav" aria-label="Primary">
+          <div class="nav__title">Navigation</div>
+          <a class="nav__link nav__link--active" href="#">Dashboard</a>
+          <a class="nav__link" href="#">Projects</a>
+          <a class="nav__link" href="#">Reports</a>
+          <a class="nav__link" href="#">Settings</a>
+        </nav>
+      </aside>
+
+      <main id="main" class="app-main">
+        <h1>Make a layout</h1>
+        <p>
+          This page uses <strong>CSS Grid</strong> for the overall structure and <strong>Flexbox</strong> for
+          alignment inside components.
+        </p>
+
+        <section class="cards" aria-label="Example content">
+          <article class="card">
+            <h2>Header</h2>
+            <p>Top bar: branding, search, and actions.</p>
+          </article>
+          <article class="card">
+            <h2>Sidebar</h2>
+            <p>Navigation links, filters, or secondary content.</p>
+          </article>
+          <article class="card">
+            <h2>Main</h2>
+            <p>Your primary content goes here.</p>
+          </article>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <small>© Your App — Footer content</small>
+      </footer>
+    </div>
+  </body>
+</html>
+
