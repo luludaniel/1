@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>자기소개 | 홍길동</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+
+    <div class="app-shell">
+      <header class="app-header">
+        <div class="brand" aria-label="브랜드">
+          <span class="brand__mark" aria-hidden="true">◎</span>
+          <span class="brand__name">홍길동</span>
+        </div>
+
+        <nav class="top-nav" aria-label="페이지 이동">
+          <a class="top-nav__link" href="#interests">관심사</a>
+          <a class="top-nav__link" href="#projects">프로젝트</a>
+          <a class="top-nav__link" href="#contact">연락</a>
+        </nav>
+      </header>
+
+      <main id="main" class="app-main">
+        <section class="hero" aria-label="소개">
+          <img class="hero__photo" src="./assets/profile.svg" alt="홍길동 프로필 사진" />
+
+          <div class="hero__content">
+            <p class="hero__eyebrow">Frontend Developer</p>
+            <h1 class="hero__title">안녕하세요, 홍길동입니다.</h1>
+            <p class="hero__subtitle">
+              사용자가 “편하다”고 느끼는 인터페이스를 만드는 걸 좋아합니다. 작은 디테일까지 신경 쓰면서도,
+              빠르게 실험하고 꾸준히 개선하는 스타일입니다.
+            </p>
+
+            <div class="hero__cta" id="contact" aria-label="연락 링크">
+              <a class="button button--primary" href="mailto:hello@example.com">이메일</a>
+              <a class="button button--ghost" href="#" aria-label="GitHub 링크(수정하세요)">GitHub</a>
+              <a class="button button--ghost" href="#" aria-label="블로그 링크(수정하세요)">Blog</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="interests" class="section" aria-label="관심사">
+          <div class="section__head">
+            <h2 class="section__title">관심사</h2>
+            <p class="section__desc">최근에 집중하고 있는 주제들입니다.</p>
+          </div>
+
+          <ul class="chips" aria-label="관심사 목록">
+            <li class="chip">UI/UX</li>
+            <li class="chip">디자인 시스템</li>
+            <li class="chip">React · TypeScript</li>
+            <li class="chip">성능 최적화</li>
+            <li class="chip">접근성(A11y)</li>
+          </ul>
+        </section>
+
+        <section id="projects" class="section" aria-label="프로젝트">
+          <div class="section__head">
+            <h2 class="section__title">프로젝트</h2>
+            <p class="section__desc">간단히 요약한 대표 작업들입니다.</p>
+          </div>
+
+          <div class="cards" role="list">
+            <article class="card" role="listitem">
+              <div class="card__top">
+                <h3 class="card__title">개인 포트폴리오</h3>
+                <span class="badge">Web</span>
+              </div>
+              <p class="card__desc">원페이지 포트폴리오(프로젝트/블로그 링크) 제작. 반응형과 접근성 개선.</p>
+              <div class="card__links">
+                <a class="link" href="#" aria-label="데모 링크(수정하세요)">Demo</a>
+                <a class="link" href="#" aria-label="레포 링크(수정하세요)">Repo</a>
+              </div>
+            </article>
+
+            <article class="card" role="listitem">
+              <div class="card__top">
+                <h3 class="card__title">할 일 관리 앱</h3>
+                <span class="badge">React</span>
+              </div>
+              <p class="card__desc">필터/정렬/검색과 로컬 저장을 지원하는 투두 앱. 컴포넌트 구조 리팩터링.</p>
+              <div class="card__links">
+                <a class="link" href="#" aria-label="데모 링크(수정하세요)">Demo</a>
+                <a class="link" href="#" aria-label="레포 링크(수정하세요)">Repo</a>
+              </div>
+            </article>
+
+            <article class="card" role="listitem">
+              <div class="card__top">
+                <h3 class="card__title">팀 대시보드</h3>
+                <span class="badge">UI</span>
+              </div>
+              <p class="card__desc">지표 카드/차트 레이아웃 설계와 공통 컴포넌트화. 로딩/에러 상태 UX 개선.</p>
+              <div class="card__links">
+                <a class="link" href="#" aria-label="설명 링크(수정하세요)">Readme</a>
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <small>© <span id="year">2026</span> 홍길동 · Built with HTML/CSS</small>
+      </footer>
+    </div>
+  </body>
+</html>
+
