@@ -1,28 +1,27 @@
-# Layout starter (HTML + CSS)
+# 자기소개 웹페이지 (HTML + CSS)
 
-This repo is intentionally minimal: it shows **how to make a layout** with semantic HTML and modern CSS.
+이 레포는 **간단한 자기소개 원페이지** 템플릿입니다. (이름/사진/관심사/프로젝트 섹션 포함)
 
-## What “layout” means
+## 구성
 
-A layout is the page structure (not the content): typically
+- **이름**: 상단 헤더 + 히어로 섹션
+- **사진**: `assets/profile.svg` (원하면 PNG/JPG로 교체 가능)
+- **관심사**: 칩(chip) 형태 목록
+- **프로젝트**: 카드(card) 리스트
 
-- `header`: top bar / branding / primary actions
-- `nav` / `aside`: navigation or sidebar
-- `main`: the primary content area
-- `footer`: bottom area (links, legal, etc.)
+## 실행
 
-## Run it
+브라우저에서 `index.html`을 열면 됩니다.
 
-Open `index.html` in a browser.
+## 수정 포인트
 
-## How it’s built
+- **이름/직무/소개글**: `index.html`의 `.hero` 영역
+- **사진 교체**: `assets/profile.svg`를 원하는 이미지로 바꾸고 `<img src="...">` 경로 수정
+- **링크**: 이메일/GitHub/Blog 및 프로젝트 Demo/Repo 링크의 `href` 수정
 
-- **CSS Grid** sets the overall page regions (header/sidebar/main/footer)
-- **Flexbox** handles small component alignment inside regions (header content, nav lists, etc.)
-- A **media query** switches from a single-column mobile layout to a two-column desktop layout
+## 파일
 
-Files:
-
-- `index.html`: semantic structure with placeholder content
-- `styles.css`: the layout rules (grid areas + responsive breakpoint)
+- `index.html`: 자기소개 섹션(이름/사진/관심사/프로젝트)이 들어있는 메인 페이지
+- `styles.css`: 깔끔한 카드/버튼/칩 스타일 + 반응형
+- `assets/profile.svg`: 기본 프로필 이미지
 
