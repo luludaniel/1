@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320" role="img" aria-label="profile">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7aa2ff" stop-opacity="0.35" />
+      <stop offset="1" stop-color="#6fd6ff" stop-opacity="0.18" />
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7aa2ff" />
+      <stop offset="1" stop-color="#6fd6ff" />
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="320" height="320" rx="48" fill="url(#bg)" />
+  <g filter="url(#shadow)">
+    <circle cx="160" cy="132" r="52" fill="rgba(231,236,255,0.92)" />
+    <path
+      d="M72 276c10-52 44-84 88-84s78 32 88 84"
+      fill="rgba(231,236,255,0.92)"
+    />
+  </g>
+  <rect x="18" y="18" width="284" height="284" rx="44" fill="none" stroke="url(#ring)" stroke-width="2" opacity="0.7" />
+</svg>
+
